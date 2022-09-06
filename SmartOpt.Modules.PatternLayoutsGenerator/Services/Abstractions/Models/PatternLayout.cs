@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SmartOpt.Core.Extensions;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 
@@ -10,11 +11,12 @@ public class PatternLayout
     {
         Waste = waste;
         RollsCount = orders.Select(item => item.RollsCount).Min();
-        foreach (OrderInfo order in orders)
+        orders.ForEach(order =>
         {
             Orders.Add(order.Clone());
             order.RollsCount -= RollsCount;
-        }
+        });
+
         // todo заменить логгером либо убрать
         Array.ForEach(Orders.ToArray(), Console.WriteLine);
         Console.WriteLine();
