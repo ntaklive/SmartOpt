@@ -20,24 +20,24 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
         
         var elementsForGroupingExist = true;
 
-        List<OrderInfo> orders = orderInfos.ToList();
+        List<OrderInfo> allOrders = orderInfos.ToList();
         while (elementsForGroupingExist)
         {
-            orders = orders.OrderByDescending(order => order.RollsCount).ToList();
+            allOrders = allOrders.OrderByDescending(order => order.RollsCount).ToList();
 
-            List<OrderInfo> ordersGroup = orders.GetRange(0, groupSize);
-            List<OrderInfo> unprocessedOrders = orders.GetRange(groupSize, orders.Count - groupSize);
+            List<OrderInfo> ordersGroup = allOrders.GetRange(0, groupSize);
+            List<OrderInfo> ungroupedOrders = allOrders.GetRange(groupSize, allOrders.Count - groupSize);
 
-            if (TryCreatePatternLayout(orders, unprocessedOrders, ordersGroup, maxWaste, maxWidth,
+            if (TryCreatePatternLayout(allOrders, ungroupedOrders, ordersGroup, maxWaste, maxWidth,
                     out PatternLayout patternLayout, out elementsForGroupingExist))
             {
                 patternLayouts.Add(patternLayout);
-                orders = MergeSplitOrders(orders);
+                allOrders = MergeSplitOrders(allOrders);
             }
         }
 
-        orders = MergeSplitOrders(orders);
-        patternLayouts.Add(new PatternLayout(orders, 100.0));
+        allOrders = MergeSplitOrders(allOrders);
+        patternLayouts.Add(new PatternLayout(allOrders, 100.0));
         return patternLayouts;
     }
 
@@ -63,13 +63,13 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
                 if (TryFindSuitableOrderIndexForSplitting(orders, out int suitableOrderForSplittingIndex))
                 {
                     SplitOrderIntoTwo(orders, suitableOrderForSplittingIndex);
-                    return false;
                 }
                 else
                 {
                     elementsForGroupingExist = false;
-                    return false;
                 }
+                
+                return false;
             }
         }
 
