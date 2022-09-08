@@ -12,20 +12,23 @@ public sealed class ApplicationState : IApplicationState
         GroupSize = 5,
         MaxWaste = 3.0,
         MaxWidth = 6000,
-        OperationType = Enums.OperationType.None
+        OperationType = OperationType.None,
+        GuiType = GuiType.Gui
     };
 
     public string? ExcelBookFilepath { get; private set; }
     public int? MaxWidth { get; private set; }
     public double? MaxWaste { get; private set; }
     public int? GroupSize { get; private set; }
-    public OperationType? OperationType { get; private set; }
+    public OperationType OperationType { get; private set; }
+    public GuiType GuiType { get; private set; }
 
     public event Action<object, string>? ExcelBookFilepathChanged;
     public event Action<object, int?>? MaxWidthChanged;
     public event Action<object, double?>? MaxWasteChanged;
     public event Action<object, int?>? GroupSizeChanged;
-    public event Action<object, OperationType?>? OperationTypeChanged;
+    public event Action<object, OperationType>? OperationTypeChanged;
+    public event Action<object, GuiType>? GuiTypeChanged;
 
     public void SetExcelWorkbookFilepath(object sender, string filepath)
     {
@@ -51,10 +54,16 @@ public sealed class ApplicationState : IApplicationState
         OnGroupSizeChanged(sender, GroupSize);
     }
 
-    public void SetOperationType(object sender, OperationType? operationType)
+    public void SetOperationType(object sender, OperationType operationType)
     {
         OperationType = operationType;
         OnOperationTypeChanged(sender, operationType);
+    }   
+    
+    public void SetGuiType(object sender, GuiType guiType)
+    {
+        GuiType = guiType;
+        OnGuiTypeChanged(sender, guiType);
     }
 
     private void OnExcelBookFilepathChanged(object sender, string value)
@@ -77,8 +86,13 @@ public sealed class ApplicationState : IApplicationState
         GroupSizeChanged?.Invoke(sender, value);
     }
 
-    private void OnOperationTypeChanged(object sender, OperationType? value)
+    private void OnOperationTypeChanged(object sender, OperationType value)
     {
         OperationTypeChanged?.Invoke(sender, value);
+    }
+
+    private void OnGuiTypeChanged(object sender, GuiType value)
+    {
+        GuiTypeChanged?.Invoke(sender, value);
     }
 }

@@ -19,7 +19,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
             const double maxWaste = 3.0;
             const int groupSize = 5;
             
-            var patternLayoutService = new PatternLayoutService();
+            var patternLayoutService = new PatternLayoutGenerator();
             var ordersMerger = new OrderInfoMerger();
 
             var orders = new List<OrderInfo>
@@ -42,7 +42,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
             
             // Act
             IList<OrderInfo> mergedOrders = ordersMerger.MergeOrdersWithIdenticalWidth(orders);
-            IList<PatternLayout> layouts = patternLayoutService.CreatePatternLayoutsFromOrders(mergedOrders, maxWidth, maxWaste, groupSize);
+            IList<PatternLayout> layouts = patternLayoutService.GeneratePatternLayoutsFromOrders(mergedOrders, maxWidth, maxWaste, groupSize);
             
             // Assert
             Assert.True(layouts[0].Waste.Equals7DigitPrecision(2.0));

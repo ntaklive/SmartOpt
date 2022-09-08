@@ -65,6 +65,7 @@
         <Compile Include="Extensions\EnumerableExtensions.cs" />
         <Compile Include="Extensions\ServiceProviderExtensions.cs" />
         <Compile Include="Infrastructure\ApplicationState.cs" />
+        <Compile Include="Infrastructure\Enums\GuiType.cs" />
         <Compile Include="Infrastructure\Enums\OperationType.cs" />
         <Compile Include="Infrastructure\Interfaces\IApplication.cs" />
         <Compile Include="Infrastructure\Interfaces\IApplicationState.cs" />

@@ -13,11 +13,18 @@ public class OrderInfoParser : IOrderInfoParser
 {
     public IList<OrderInfo> ParseOrdersFromActiveExcelWorksheet()
     {
-        Application excel = null!;
+        return ParseOrdersFromExcelWorksheetInternal(GetExcel());
+    }
+    
+    public IList<OrderInfo> ParseOrdersFromExcelWorksheet(string workbookFilepath)
+    {
+        return ParseOrdersFromExcelWorksheetInternal(GetExcel(workbookFilepath));
+    }
+    
+    private IList<OrderInfo> ParseOrdersFromExcelWorksheetInternal(Application excel)
+    {
         try
         {
-            excel = (Marshal.GetActiveObject("Excel.Application") as Application)!;
-
             if (excel.ActiveSheet is not Worksheet activeSheet)
             {
                 throw new InvalidOperationException("Unable to find any active worksheet");
@@ -34,18 +41,39 @@ public class OrderInfoParser : IOrderInfoParser
         }
         catch (Exception exception)
         {
-            throw new InvalidOperationException("Unable to connect with an active Excel application", exception);
+            throw new InvalidOperationException("An unexpected error was occured", exception);
         }
         finally
         {
-            Marshal.ReleaseComObject(excel.ActiveSheet);
+            if (excel.ActiveSheet != null)
+            {
+                Marshal.ReleaseComObject(excel.ActiveSheet);
+            }
+
             Marshal.ReleaseComObject(excel);
         }
     }
 
-    public IList<OrderInfo> ParseOrdersFromExcelWorksheet(string filePath)
+    private Application GetExcel(string? workbookFilepath = null)
     {
-        throw new NotImplementedException();
+        Application excel;
+        if (workbookFilepath == null)
+        {
+            object? excelCom = Marshal.GetActiveObject("Excel.Application");
+            if (excelCom == null)
+            {
+                throw new InvalidOperationException("Unable to connect with an active Excel application");
+            }
+            
+            excel = (excelCom as Application)!;
+        }
+        else
+        {
+            excel = new Application();
+            excel.Workbooks.Add(workbookFilepath);
+        }
+
+        return excel;
     }
 
     /// <summary>

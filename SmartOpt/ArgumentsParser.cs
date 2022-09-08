@@ -11,7 +11,7 @@ public class ArgumentsParser
     {
         filepath = null!;
 
-        var regex = new Regex(@"-workbookFilepath ""(.+\.(xlsm|xlsx))""");
+        var regex = new Regex(@"-workbookFilepath '(.+\.(xlsm|xlsx))\'");
         Match match = regex.Match(args);
         if (!match.Success)
         {
@@ -83,12 +83,30 @@ public class ArgumentsParser
         operationType = parsedOperationType;
         return true;
     }
+    
+    public bool TryParseGuiType(string args, out GuiType guiType)
+    {
+        guiType = GuiType.Gui;
+
+        if (!TryParseValueFromRegex(@"-(gui|noGui)", args, out string argumentValue))
+        {
+            return false;
+        }
+
+        if (!Enum.TryParse(argumentValue, true, out GuiType parsedGuiType))
+        {
+            return false;
+        }
+
+        guiType = parsedGuiType;
+        return true;
+    }
 
     private bool TryParseValueFromRegex(string pattern, string args, out string value)
     {
         value = default!;
 
-        var regex = new Regex(pattern);
+        var regex = new Regex(pattern, RegexOptions.IgnoreCase);
         Match match = regex.Match(args);
         if (!match.Success)
         {

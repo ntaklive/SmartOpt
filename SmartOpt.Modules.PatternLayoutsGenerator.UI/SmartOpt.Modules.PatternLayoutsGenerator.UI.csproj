@@ -5,7 +5,7 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{3AC5B28E-F828-47C9-B008-E603870C3590}</ProjectGuid>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Library</OutputType>
         <RootNamespace>SmartOpt.Modules.PatternLayoutsGenerator.UI</RootNamespace>
         <AssemblyName>SmartOpt.Modules.PatternLayoutsGenerator.UI</AssemblyName>
         <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -36,6 +36,9 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+        <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+          <HintPath>..\packages\Ninject.3.2.2.0\lib\net40\Ninject.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
@@ -48,23 +51,15 @@
         <Reference Include="PresentationFramework" />
     </ItemGroup>
     <ItemGroup>
-        <ApplicationDefinition Include="App.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <SubType>Designer</SubType>
-        </ApplicationDefinition>
+        <Compile Include="Commands\RelayCommand.cs" />
+        <Compile Include="PatternLayoutGeneratorUiModule.cs" />
+        <Compile Include="ViewModels\Interfaces\IMainWindowViewModel.cs" />
         <Compile Include="ViewModels\MainWindowViewModel.cs" />
         <Compile Include="ViewModels\ViewModelBase.cs" />
         <Compile Include="Views\MainWindow.xaml.cs" />
-        <Compile Include="App.xaml.cs">
-            <DependentUpon>App.xaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Include="Commands\CommandBase.cs" />
-        <Compile Include="Commands\GenerateTemplateLayoutCommand.cs" />
         <Page Include="Views\MainWindow.xaml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Models\MainWindowModel.cs" />
         <Compile Include="Properties\AssemblyInfo.cs">
             <SubType>Code</SubType>
         </Compile>
@@ -80,6 +75,7 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />
+        <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SmartOpt.Modules.PatternLayoutsGenerator\SmartOpt.Modules.PatternLayoutsGenerator.csproj">

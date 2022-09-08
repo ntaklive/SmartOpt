@@ -7,5 +7,6 @@ public interface IOrderInfoParser
 {
     public IList<OrderInfo> ParseOrdersFromActiveExcelWorksheet();
     
-    public IList<OrderInfo> ParseOrdersFromExcelWorksheet(string filePath);
+    // todo add worksheetId parameter. by default this method uses 0
+    public IList<OrderInfo> ParseOrdersFromExcelWorksheet(string workbookFilepath);
 }

@@ -10,7 +10,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public class ReportExporter : IReportExporter
 {
-    public void ExportToExcel(Report report)
+    public void ExportToNewExcelWorkbook(Report report)
     {
         ICollection<PatternLayout> patternLayouts = report.PatternLayouts;
 

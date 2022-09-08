@@ -1,13 +1,13 @@
 using System;
+using System.Windows;
 using SmartOpt.Core.Extensions;
 using SmartOpt.Core.Infrastructure.Enums;
 using SmartOpt.Core.Infrastructure.Interfaces;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
-using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 
 namespace SmartOpt;
 
-public class Application : IApplication
+public partial class Application : IApplication
 {
     private readonly IServiceProvider _provider;
     private readonly IApplicationState _applicationState;
@@ -20,17 +20,31 @@ public class Application : IApplication
 
     public void Start()
     {
-        switch (_applicationState.OperationType)
+        try
         {
-            case OperationType.GeneratePatternLayouts:
-                GeneratePatternLayouts(
-                    _provider.GetRequiredService<IPatternLayoutService>(),
-                    _provider.GetRequiredService<IOrderInfoMerger>(),
-                    _provider.GetRequiredService<IReportService>(),
-                    _provider.GetRequiredService<IReportExporter>(),
-                    _provider.GetRequiredService<IOrderInfoParser>()
+            switch (_applicationState)
+            {
+                case {OperationType: OperationType.GeneratePatternLayouts, GuiType: GuiType.Gui}:
+                    GeneratePatternLayoutsGui(
+                        _provider.GetRequiredService<IPatternLayoutService>(),
+                        _provider.GetRequiredService<IReportExporter>()
                     );
-                break;
+                    break;
+                case {OperationType: OperationType.GeneratePatternLayouts, GuiType: GuiType.NoGui}:
+                    GeneratePatternLayoutsNoGui(
+                        _provider.GetRequiredService<IPatternLayoutService>(),
+                        _provider.GetRequiredService<IReportExporter>()
+                    );
+                    break;
+                case {OperationType: OperationType.None}:
+                    throw new InvalidOperationException("Operation type is not specified");
+            }
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.InnerException != null ? exception.InnerException.Message : exception.Message,
+                "A critical error was occured",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -39,20 +53,7 @@ public class Application : IApplication
         return _provider;
     }
 
-    private void GeneratePatternLayouts(
-        IPatternLayoutService patternLayoutService,
-        IOrderInfoMerger orderInfoMerger,
-        IReportService reportService,
-        IReportExporter reportExporter,
-        IOrderInfoParser orderInfoParser)
-    {
-        var orders = orderInfoParser.ParseOrdersFromActiveExcelWorksheet();
-        var mergedOrders = orderInfoMerger.MergeOrdersWithIdenticalWidth(orders);
-        var patternLayouts = patternLayoutService.CreatePatternLayoutsFromOrders(mergedOrders,
-            _applicationState.MaxWidth.Value, _applicationState.MaxWaste.Value, _applicationState.GroupSize.Value);
-        reportExporter.ExportToExcel(new Report(patternLayouts));
+    
 
-        // var app = new App();
-        // app.Run();
-    }
+    
 }

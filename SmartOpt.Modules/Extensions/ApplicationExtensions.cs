@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SmartOpt.Core.Extensions;
-using SmartOpt.Core.Infrastructure;
 using SmartOpt.Core.Infrastructure.Interfaces;
 
 namespace SmartOpt.Modules.Extensions;

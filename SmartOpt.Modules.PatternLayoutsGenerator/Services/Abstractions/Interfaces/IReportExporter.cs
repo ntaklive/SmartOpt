@@ -4,5 +4,5 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
 
 public interface IReportExporter
 {
-    public void ExportToExcel(Report report);
+    public void ExportToNewExcelWorkbook(Report report);
 }

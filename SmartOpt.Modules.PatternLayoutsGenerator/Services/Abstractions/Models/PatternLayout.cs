@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SmartOpt.Core.Extensions;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 

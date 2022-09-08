@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Ninject;
-using SmartOpt.Core.Infrastructure;
 using SmartOpt.Core.Infrastructure.Interfaces;
 
 namespace SmartOpt.Modules.Extensions;

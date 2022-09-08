@@ -1,17 +1,18 @@
 using System.Windows.Input;
-using SmartOpt.Modules.PatternLayoutsGenerator.UI.Commands;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.UI.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
 {
-    private int _maxWidth;
+    private int _maxWidth = 6000;
+    private double _maxWaste = 3.0;
+    private int _groupSize = 5;
+    private string? _workbookFilepath;
 
     public MainWindowViewModel()
     {
-        GenerateTemplateLayout = new GenerateTemplateLayoutCommand();
     }
-    
+
     public int MaxWidth
     {
         get => _maxWidth;
@@ -22,5 +23,37 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public ICommand GenerateTemplateLayout { get; }
+    public double MaxWaste
+    {
+        get => _maxWaste;
+        set
+        {
+            _maxWaste = value;
+            OnPropertyChanged(nameof(MaxWaste));
+        }
+    }
+
+    public int GroupSize
+    {
+        get => _groupSize;
+        set
+        {
+            _groupSize = value;
+            OnPropertyChanged(nameof(GroupSize));
+        }
+    }    
+    
+    public string? WorkbookFilename
+    {
+        get => _workbookFilepath ?? "Active workbook";
+        set
+        {
+            _workbookFilepath = value;
+            OnPropertyChanged(nameof(WorkbookFilename));
+        }
+    }
+
+    public ICommand GeneratePatternLayouts { get; set; } = null!;
+    public ICommand IncrementGroupSize { get; set; } = null!;
+    public ICommand DecrementGroupSize { get; set; } = null!;
 }

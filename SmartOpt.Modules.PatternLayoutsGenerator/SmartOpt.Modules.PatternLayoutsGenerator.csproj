@@ -54,18 +54,17 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IOrderInfoMerger.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IOrderInfoParser.cs" />
+        <Compile Include="Services\Abstractions\Interfaces\IPatternLayoutGenerator.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IPatternLayoutService.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IReportExporter.cs" />
-        <Compile Include="Services\Abstractions\Interfaces\IReportService.cs" />
         <Compile Include="Services\Abstractions\Models\OrderInfo.cs" />
         <Compile Include="Services\Abstractions\Models\PatternLayout.cs" />
         <Compile Include="Services\Abstractions\Models\Report.cs" />
         <Compile Include="Services\Implementations\OrderInfoMerger.cs" />
         <Compile Include="Services\Implementations\OrderInfoParser.cs" />
+        <Compile Include="Services\Implementations\PatternLayoutGenerator.cs" />
         <Compile Include="Services\Implementations\PatternLayoutService.cs" />
-        <Compile Include="Services\Implementations\PatternLayoutService1.cs" />
         <Compile Include="Services\Implementations\ReportExporter.cs" />
-        <Compile Include="Services\Implementations\ReportService.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SmartOpt.Core\SmartOpt.Core.csproj">

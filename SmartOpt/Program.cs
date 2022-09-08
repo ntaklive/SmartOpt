@@ -7,79 +7,93 @@ using SmartOpt.Core.Infrastructure.Interfaces;
 using SmartOpt.Modules;
 using SmartOpt.Modules.Extensions;
 using SmartOpt.Modules.PatternLayoutsGenerator;
+using SmartOpt.Modules.PatternLayoutsGenerator.UI;
 
 namespace SmartOpt;
 
 public static class Program
 {
+    private static readonly IApplicationState ApplicationState = new ApplicationState();
+    
     [STAThread]
     public static void Main(string[]? args)
     {
-        IApplicationState? applicationState = null;
         if (args != null && args.Length > 0)
         {
-            applicationState = new ApplicationState();
-            var argumentsParser = new ArgumentsParser();
-
-            string aggregatedArgs = args.Aggregate((s1, s2) => $"{s1} {s2}");
-
-            if (argumentsParser.TryParseOperationType(aggregatedArgs, out OperationType operationType))
-            {
-                applicationState.SetOperationType(null!, operationType);
-
-                if (operationType == OperationType.GeneratePatternLayouts)
-                {
-                    if (argumentsParser.TryParseExcelWorkbookFilepath(aggregatedArgs, out string workbookFilepath))
-                    {
-                        applicationState.SetExcelWorkbookFilepath(null!, workbookFilepath);
-                    }
-                    // todo: else get active worksheet
-
-                    if (argumentsParser.TryParseGroupSize(aggregatedArgs, out int groupSize))
-                    {
-                        applicationState.SetGroupSize(null!, groupSize);
-                    }
-                    else
-                    {
-                        ThrowInvalidArgumentValue(nameof(groupSize));
-                    }
-
-                    if (argumentsParser.TryParseMaxWidth(aggregatedArgs, out int maxWidth))
-                    {
-                        applicationState.SetMaxWidth(null!, maxWidth);
-                    }
-                    else
-                    {
-                        ThrowInvalidArgumentValue(nameof(maxWidth));
-                    }
-
-                    if (argumentsParser.TryParseMaxWaste(aggregatedArgs, out double maxWaste))
-                    {
-                        applicationState.SetMaxWaste(null!, maxWaste);
-                    }
-                    else
-                    {
-                        ThrowInvalidArgumentValue(nameof(maxWaste));
-                    }
-                }
-            }
+            HandleArguments(args);
         }
 
         var kernel = new StandardKernel();
         kernel.AddModules(new[]
         {
             typeof(CommonModule),
-            typeof(PatternLayoutGeneratorModule)
+            typeof(PatternLayoutGeneratorModule),
+            typeof(PatternLayoutGeneratorUiModule)
         });
-        kernel.AddApplicationState(applicationState ?? ApplicationState.Default);
+        kernel.AddApplicationState(ApplicationState);
 
         var app = new Application(kernel);
         app.InitializeModules();
         app.Start();
     }
 
-    private static void ThrowInvalidArgumentValue(string argumentName)
+    private static void HandleArguments(string[] args)
     {
-        throw new InvalidOperationException($"The '{argumentName}' argument has an invalid value");
+        var argumentsParser = new ArgumentsParser();
+
+        string aggregatedArgs = args.Aggregate((s1, s2) => $"{s1} {s2}");
+
+        if (argumentsParser.TryParseGuiType(aggregatedArgs, out GuiType guiType))
+        {
+            ApplicationState.SetGuiType(null!, guiType);
+        }
+            
+        if (argumentsParser.TryParseOperationType(aggregatedArgs, out OperationType operationType))
+        {
+            ApplicationState.SetOperationType(null!, operationType);
+
+            if (operationType == OperationType.GeneratePatternLayouts)
+            {
+                if (argumentsParser.TryParseExcelWorkbookFilepath(aggregatedArgs, out string workbookFilepath))
+                {
+                    ApplicationState.SetExcelWorkbookFilepath(null!, workbookFilepath);
+                }
+
+                if (argumentsParser.TryParseGroupSize(aggregatedArgs, out int groupSize))
+                {
+                    ApplicationState.SetGroupSize(null!, groupSize);
+                }
+                else
+                {
+                    ThrowInvalidArgumentValueIfNoGui(nameof(groupSize));
+                }
+
+                if (argumentsParser.TryParseMaxWidth(aggregatedArgs, out int maxWidth))
+                {
+                    ApplicationState.SetMaxWidth(null!, maxWidth);
+                }
+                else
+                {
+                    ThrowInvalidArgumentValueIfNoGui(nameof(maxWidth));
+                }
+
+                if (argumentsParser.TryParseMaxWaste(aggregatedArgs, out double maxWaste))
+                {
+                    ApplicationState.SetMaxWaste(null!, maxWaste);
+                }
+                else
+                {
+                    ThrowInvalidArgumentValueIfNoGui(nameof(maxWaste));
+                }
+            }
+        }
+    }
+
+    private static void ThrowInvalidArgumentValueIfNoGui(string argumentName)
+    {
+        if (ApplicationState.GuiType == GuiType.NoGui)
+        {
+            throw new InvalidOperationException($"The '{argumentName}' argument has an invalid value");
+        }
     }
 }
