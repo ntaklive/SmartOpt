@@ -50,7 +50,7 @@ public class ReportExporter : IReportExporter
         foreach (PatternLayout? order in data)
         {
             index = 0;
-            List<OrderInfo> o = order.Orders;
+            IReadOnlyCollection<OrderInfo> o = order.Orders;
             foreach (OrderInfo orderInfo in o)
             {
                 index++;
@@ -77,7 +77,7 @@ public class ReportExporter : IReportExporter
         startFromRow++;
 
         index = 0;
-        List<OrderInfo> o2 = remnants.Orders;
+        IReadOnlyCollection<OrderInfo> o2 = remnants.Orders;
         foreach (OrderInfo orderInfo in o2)
         {
             index++;

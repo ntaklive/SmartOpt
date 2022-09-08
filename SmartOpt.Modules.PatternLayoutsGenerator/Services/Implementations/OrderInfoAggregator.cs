@@ -5,11 +5,10 @@ using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services
 {
-    public class OrderInfoMerger : IOrderInfoMerger
+    public class OrderInfoAggregator : IOrderInfoAggregator
     {
-        public IList<OrderInfo> MergeOrdersWithIdenticalWidth(ICollection<OrderInfo> orders)
+        public IList<OrderInfo> AggregateOrdersWithIdenticalWidth(ICollection<OrderInfo> orders)
         {
-            // todo: Bad, unreadable code
             IEnumerable<int> elementsCount = orders
                 .Select(x => x.Width)
                 .Distinct();

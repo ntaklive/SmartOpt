@@ -5,6 +5,6 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
 
 public interface IPatternLayoutGenerator
 {
-    public IList<PatternLayout> GeneratePatternLayoutsFromOrders(
-        IList<OrderInfo> orderInfos, int maxWidth, double maxWaste, int groupSize);
+    public Report GeneratePatternLayoutsFromOrders(IReadOnlyCollection<OrderInfo> orders,
+        int maxWidth, double maxWaste, int groupSize);
 }

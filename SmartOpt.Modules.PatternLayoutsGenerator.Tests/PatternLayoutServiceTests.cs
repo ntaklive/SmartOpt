@@ -3,6 +3,7 @@ using NUnit.Framework;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 using SmartOpt.Modules.PatternLayoutsGenerator.Tests.Extensions;
+using Theraot.Collections;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
 {
@@ -20,7 +21,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
             const int groupSize = 5;
             
             var patternLayoutService = new PatternLayoutGenerator();
-            var ordersMerger = new OrderInfoMerger();
+            var ordersMerger = new OrderInfoAggregator();
 
             var orders = new List<OrderInfo>
             {
@@ -41,14 +42,14 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
             };
             
             // Act
-            IList<OrderInfo> mergedOrders = ordersMerger.MergeOrdersWithIdenticalWidth(orders);
-            IList<PatternLayout> layouts = patternLayoutService.GeneratePatternLayoutsFromOrders(mergedOrders, maxWidth, maxWaste, groupSize);
+            IList<OrderInfo> mergedOrders = ordersMerger.AggregateOrdersWithIdenticalWidth(orders);
+            Report report = patternLayoutService.GeneratePatternLayoutsFromOrders(mergedOrders.AsIReadOnlyCollection(), maxWidth, maxWaste, groupSize);
             
             // Assert
-            Assert.True(layouts[0].Waste.Equals7DigitPrecision(2.0));
-            Assert.True(layouts[1].Waste.Equals7DigitPrecision(0));
-            Assert.True(layouts[0].RollsCount.Equals7DigitPrecision(2.53549695740365));
-            Assert.True(layouts[1].RollsCount.Equals7DigitPrecision(1.57200811359027));
+            Assert.True(report.PatternLayouts[0].Waste.Equals7DigitPrecision(2.0));
+            Assert.True(report.PatternLayouts[1].Waste.Equals7DigitPrecision(0));
+            Assert.True(report.PatternLayouts[0].RollsCount.Equals7DigitPrecision(2.53549695740365));
+            Assert.True(report.PatternLayouts[1].RollsCount.Equals7DigitPrecision(1.57200811359027));
         }
     }
 }

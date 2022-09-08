@@ -3,12 +3,13 @@ using System.Linq;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
 using SmartOpt.Core.Extensions;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
+using Theraot.Collections;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public class PatternLayoutGenerator : IPatternLayoutGenerator
 {
-    public IList<PatternLayout> GeneratePatternLayoutsFromOrders(IList<OrderInfo> orderInfos,
+    public Report GeneratePatternLayoutsFromOrders(IReadOnlyCollection<OrderInfo> orderInfos,
         int maxWidth, double maxWaste, int groupSize)
     {
         if (orderInfos.Count < groupSize)
@@ -16,14 +17,14 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
             groupSize = orderInfos.Count;
         }
         
-        var patternLayouts = new List<PatternLayout>();
+        var report = new Report();
+        
+        List<OrderInfo> allOrders = orderInfos.ToList();
         
         var elementsForGroupingExist = true;
-
-        List<OrderInfo> allOrders = orderInfos.ToList();
         while (elementsForGroupingExist)
         {
-            allOrders = allOrders.OrderByDescending(order => order.RollsCount).ToList();
+            allOrders.Sort((prev, next) => next.RollsCount.CompareTo(prev.RollsCount));
 
             List<OrderInfo> ordersGroup = allOrders.GetRange(0, groupSize);
             List<OrderInfo> ungroupedOrders = allOrders.GetRange(groupSize, allOrders.Count - groupSize);
@@ -31,16 +32,27 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
             if (TryCreatePatternLayout(allOrders, ungroupedOrders, ordersGroup, maxWaste, maxWidth,
                     out PatternLayout patternLayout, out elementsForGroupingExist))
             {
-                patternLayouts.Add(patternLayout);
                 allOrders = MergeSplitOrders(allOrders);
+                AddPatternLayoutToReport(report, patternLayout);
             }
         }
 
         allOrders = MergeSplitOrders(allOrders);
-        patternLayouts.Add(new PatternLayout(allOrders, 100.0));
-        return patternLayouts;
+        AddRemainingOrdersToReport(report, allOrders);
+        return report;
     }
 
+    private static void AddPatternLayoutToReport(Report report, PatternLayout patternLayout)
+    {
+        report.AddPatternLayout(patternLayout);
+    }
+
+    private static void AddRemainingOrdersToReport(Report report, List<OrderInfo> remainingOrders)
+    {
+        PatternLayout patternLayout = CreatePatternLayout(remainingOrders, 100.0);
+        report.AddPatternLayout(patternLayout);
+    }
+    
     private static bool TryCreatePatternLayout(
         List<OrderInfo> orders, List<OrderInfo> unprocessedOrders,
         List<OrderInfo> ordersGroup, double maxWaste, int maxWidth,
@@ -73,8 +85,21 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
             }
         }
 
-        patternLayout = new PatternLayout(ordersGroup, groupWaste);
+        patternLayout = CreatePatternLayout(ordersGroup, groupWaste);
         return true;
+    }
+    
+    private static PatternLayout CreatePatternLayout(List<OrderInfo> orders, double waste)
+    {
+        double minGroupRollsCount = orders.Min(x => x.RollsCount);
+        var ordersGroup = new List<OrderInfo>();
+        orders.ForEach(order =>
+        {
+            ordersGroup.Add(order.Clone());
+            order.RollsCount -= minGroupRollsCount;
+        });
+        
+        return new PatternLayout(ordersGroup, minGroupRollsCount, waste);
     }
 
     private static List<OrderInfo> MergeSplitOrders(IEnumerable<OrderInfo> splitOrders)
@@ -109,18 +134,18 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
         return index >= 0;
     }
 
-    private static bool TryFindSuitableOrderIndexForReplacing(List<OrderInfo> ordersGroup, List<OrderInfo> unprocessedOrders, double waste, int maxWidth, double maxWaste, out int index)
+    private static bool TryFindSuitableOrderIndexForReplacing(List<OrderInfo> ordersGroup, List<OrderInfo> unprocessedOrders, double groupWaste, int maxWidth, double maxWaste, out int index)
     {
         index = 0;
         
-        if (waste >= maxWaste)
+        if (groupWaste >= maxWaste)
         {
             ordersGroup.Sort((prev, next) =>
                 prev.Width.CompareTo(next.Width));
             
             index = unprocessedOrders.FindIndex(item =>
                 ordersGroup[0].Width < item.Width &&
-                item.Width - ordersGroup[0].Width < maxWidth * waste / 100 &&
+                item.Width - ordersGroup[0].Width < maxWidth * groupWaste / 100 &&
                 item.RollsCount >= 1);
         }
         else
@@ -130,12 +155,10 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
             
             index = unprocessedOrders.FindIndex(item =>
                 ordersGroup[0].Width > item.Width &&
-                ordersGroup[0].Width - item.Width > maxWidth * waste / 100 &&
+                ordersGroup[0].Width - item.Width > maxWidth * groupWaste / 100 &&
                 item.RollsCount >= 1);
         }
 
         return index >= 0;
     }
 }
-
-// todo зачем объединять заказы, если они потом режутся. смысл резать 2 объединенных в один заказа заказ

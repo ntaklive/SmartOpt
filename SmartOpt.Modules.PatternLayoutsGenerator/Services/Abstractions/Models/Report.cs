@@ -4,10 +4,20 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 
 public class Report
 {
-    public Report(ICollection<PatternLayout> patternLayouts)
+    public Report(IEnumerable<PatternLayout> patternLayouts)
     {
-        PatternLayouts = patternLayouts;
+        PatternLayouts = new List<PatternLayout>(patternLayouts);
     }
-    
-    public ICollection<PatternLayout> PatternLayouts { get; }
+
+    public Report()
+    {
+        PatternLayouts = new List<PatternLayout>();
+    }
+
+    public List<PatternLayout> PatternLayouts { get; }
+
+    public void AddPatternLayout(PatternLayout patternLayout)
+    {
+        PatternLayouts.Add(patternLayout);
+    }
 }
