@@ -12,7 +12,7 @@ public class ReportExporter : IReportExporter
 {
     public void ExportToNewExcelWorkbook(Report report)
     {
-        ICollection<PatternLayout> patternLayouts = report.PatternLayouts;
+        IReadOnlyList<PatternLayout> patternLayouts = report.GetPatternLayouts();
 
         List<PatternLayout> data = patternLayouts.Take(patternLayouts.Count() - 1).ToList();
         PatternLayout remnants = patternLayouts.Last();
@@ -22,9 +22,11 @@ public class ReportExporter : IReportExporter
             DisplayAlerts = false,
             WindowState = XlWindowState.xlMaximized
         };
+        
         app.Workbooks.Add();
+        
         var activeWorksheet = (app.ActiveSheet as Worksheet)!;
-        activeWorksheet.Name = "Results";
+        activeWorksheet.Name = "Результаты";
 
         var startFromRow = 3;
         var index = 0;
@@ -33,13 +35,8 @@ public class ReportExporter : IReportExporter
         activeWorksheet.Range[activeWorksheet.Cells[1, 1], activeWorksheet.Cells[1, 6]].Merge();
         activeWorksheet.Cells[1, 1] = "Обработано";
 
-        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]]
-                .Style)
-            .VerticalAlignment = XlVAlign.xlVAlignCenter;
-        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]]
-                .Style)
-            .HorizontalAlignment =
-            XlHAlign.xlHAlignCenter;
+        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]].Style).VerticalAlignment = XlVAlign.xlVAlignCenter;
+        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]].Style).HorizontalAlignment = XlHAlign.xlHAlignCenter;
 
         activeWorksheet.Cells[2, 1] = "№";
         activeWorksheet.Cells[2, 2] = "Наименования";
@@ -59,14 +56,11 @@ public class ReportExporter : IReportExporter
                 activeWorksheet.Cells[startFromRow + index - 1, 4] = (int) orderInfo.RollsCount;
             }
 
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1],
-                activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 5],
-                activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6],
-                activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
+            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
+            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 5], activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
+            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
             activeWorksheet.Cells[startFromRow, 1] = orderIndex;
-            activeWorksheet.Cells[startFromRow, 5] = Math.Round(order.Waste, 2);
+            activeWorksheet.Cells[startFromRow, 5] = order.Waste;
             activeWorksheet.Cells[startFromRow, 6] = order.RollsCount;
             startFromRow += index;
             orderIndex++;
@@ -75,7 +69,7 @@ public class ReportExporter : IReportExporter
         activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow, 6]].Merge();
         activeWorksheet.Cells[startFromRow, 1] = "Не обработано";
         startFromRow++;
-
+ 
         index = 0;
         IReadOnlyCollection<OrderInfo> o2 = remnants.Orders;
         foreach (OrderInfo orderInfo in o2)
@@ -86,12 +80,9 @@ public class ReportExporter : IReportExporter
             activeWorksheet.Cells[startFromRow + index - 1, 4] = orderInfo.RollsCount;
         }
 
-        activeWorksheet
-            .Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
-        activeWorksheet
-            .Range[activeWorksheet.Cells[startFromRow, 5], activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
-        activeWorksheet
-            .Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
+        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
+        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 5], activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
+        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
         activeWorksheet.Cells[startFromRow, 1] = orderIndex;
         activeWorksheet.Range[activeWorksheet.Cells[2, 2], activeWorksheet.Cells[startFromRow, 6]].Columns.AutoFit();
 

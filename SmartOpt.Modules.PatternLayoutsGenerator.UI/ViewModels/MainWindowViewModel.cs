@@ -1,9 +1,11 @@
 using System.Windows.Input;
+using SmartOpt.Modules.PatternLayoutsGenerator.UI.Services;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.UI.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
 {
+    private bool _isInteractionAllowed = true;
     private int _maxWidth = 6000;
     private double _maxWaste = 3.0;
     private int _groupSize = 5;
@@ -11,8 +13,19 @@ public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
 
     public MainWindowViewModel()
     {
+        BusyIndicatorManager = BusyIndicatorManager.Instance;
     }
 
+    public bool IsInteractionAllowed
+    {
+        get => _isInteractionAllowed;
+        set
+        {
+            _isInteractionAllowed = value;
+            OnPropertyChanged(nameof(IsInteractionAllowed));
+        }
+    }
+    
     public int MaxWidth
     {
         get => _maxWidth;
@@ -45,7 +58,7 @@ public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
     
     public string? WorkbookFilename
     {
-        get => _workbookFilepath ?? "Active workbook";
+        get => _workbookFilepath ?? "Не указано";
         set
         {
             _workbookFilepath = value;
@@ -56,4 +69,6 @@ public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
     public ICommand GeneratePatternLayouts { get; set; } = null!;
     public ICommand IncrementGroupSize { get; set; } = null!;
     public ICommand DecrementGroupSize { get; set; } = null!;
+
+    public BusyIndicatorManager BusyIndicatorManager { get; }
 }

@@ -8,11 +8,11 @@ public class PatternLayout
     public PatternLayout(IEnumerable<OrderInfo> orders, double rollsCount, double waste)
     {
         Waste = waste;
-        Orders = orders.AsIReadOnlyCollection();
+        Orders = orders.AsIReadOnlyList();
         RollsCount = rollsCount;
     }
 
-    public IReadOnlyCollection<OrderInfo> Orders { get; }
+    public IReadOnlyList<OrderInfo> Orders { get; }
     
     public double RollsCount { get; }
     

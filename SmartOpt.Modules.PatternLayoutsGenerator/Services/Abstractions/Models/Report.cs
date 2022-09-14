@@ -1,23 +1,36 @@
 using System.Collections.Generic;
+using System.Linq;
+using Theraot.Collections;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 
 public class Report
 {
-    public Report(IEnumerable<PatternLayout> patternLayouts)
-    {
-        PatternLayouts = new List<PatternLayout>(patternLayouts);
-    }
+    private readonly List<PatternLayout> _patternLayouts;
+    private readonly List<OrderInfo> _ungroupedOrders;
 
+    public Report(IEnumerable<PatternLayout> patternLayouts, IEnumerable<OrderInfo> ungroupedOrders)
+    {
+        _patternLayouts = patternLayouts.ToList();
+        _ungroupedOrders = ungroupedOrders.ToList();
+    }
+    
     public Report()
     {
-        PatternLayouts = new List<PatternLayout>();
+        _patternLayouts = new List<PatternLayout>();
+        _ungroupedOrders = new List<OrderInfo>();
     }
-
-    public List<PatternLayout> PatternLayouts { get; }
+    
+    public IReadOnlyList<PatternLayout> GetPatternLayouts() => _patternLayouts.AsIReadOnlyList();
+    public IReadOnlyList<OrderInfo> GetUngroupedOrders() => _ungroupedOrders.AsIReadOnlyList();
 
     public void AddPatternLayout(PatternLayout patternLayout)
     {
-        PatternLayouts.Add(patternLayout);
+        _patternLayouts.Add(patternLayout);
+    }    
+    
+    public void AddUngroupedOrders(IEnumerable<OrderInfo> ungroupedOrders)
+    {
+        _ungroupedOrders.AddRange(ungroupedOrders);
     }
 }

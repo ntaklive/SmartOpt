@@ -49,8 +49,9 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
 
     private static void AddRemainingOrdersToReport(Report report, List<OrderInfo> remainingOrders)
     {
+        // Implementation details. CreatePatternLayout method is "subtracting rolls count from the remaining orders"
         PatternLayout patternLayout = CreatePatternLayout(remainingOrders, 100.0);
-        report.AddPatternLayout(patternLayout);
+        report.AddUngroupedOrders(patternLayout.Orders);
     }
     
     private static bool TryCreatePatternLayout(

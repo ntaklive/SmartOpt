@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7BD67B19
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartOpt.Modules.PatternLayoutsGenerator.Tests", "SmartOpt.Modules.PatternLayoutsGenerator.Tests\SmartOpt.Modules.PatternLayoutsGenerator.Tests.csproj", "{83DAE879-6EA1-40E8-8048-032D8357816E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConsole", "TestConsole\TestConsole.csproj", "{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{83DAE879-6EA1-40E8-8048-032D8357816E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83DAE879-6EA1-40E8-8048-032D8357816E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83DAE879-6EA1-40E8-8048-032D8357816E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{83DAE879-6EA1-40E8-8048-032D8357816E} = {7BD67B19-B8C7-4A1F-B655-E17A5539F05E}
