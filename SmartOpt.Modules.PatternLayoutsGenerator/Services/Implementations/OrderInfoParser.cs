@@ -11,28 +11,39 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public class OrderInfoParser : IOrderInfoParser
 {
+    private readonly IExcelInteropWrapper _excel;
+
+    public OrderInfoParser(IExcelInteropWrapper excel)
+    {
+        _excel = excel;
+    }
+
     public IList<OrderInfo> ParseOrdersFromActiveExcelWorksheet()
     {
-        return ParseOrdersFromExcelWorksheetInternal(GetExcel());
+        return ParseOrdersFromExcelWorksheetInternal(true, null);
     }
-    
+
     public IList<OrderInfo> ParseOrdersFromExcelWorksheet(string workbookFilepath)
     {
-        return ParseOrdersFromExcelWorksheetInternal(GetExcel(workbookFilepath));
+        return ParseOrdersFromExcelWorksheetInternal(false, workbookFilepath);
     }
-    
-    private IList<OrderInfo> ParseOrdersFromExcelWorksheetInternal(Application excel)
+
+    private IList<OrderInfo> ParseOrdersFromExcelWorksheetInternal(bool useActiveWorksheet, string? workbookFilepath)
     {
+        _excel.StartExcelApplication(new ExcelInteropStartupArguments
+        {
+            IsVisible = false,
+            DisplayAlerts = false,
+            WindowState = XlWindowState.xlNormal,
+            UseActiveWorksheet = useActiveWorksheet,
+            WorkbookFilepath = workbookFilepath
+        });
+
         try
         {
-            if (excel.ActiveSheet is not Worksheet activeSheet)
-            {
-                throw new InvalidOperationException("Unable to find any active worksheet");
-            }
-
-            List<string> nameColumnValues = ParseColumn<string>(activeSheet, 1);
-            List<int> widthColumnValues = ParseColumn<int>(activeSheet, 3);
-            List<double> countColumnValues = ParseColumn<double>(activeSheet, 14);
+            IReadOnlyList<string> nameColumnValues = _excel.ParseColumn<string>(1, 3);
+            IReadOnlyList<int> widthColumnValues = _excel.ParseColumn<int>(3, 3);
+            IReadOnlyList<double> countColumnValues = _excel.ParseColumn<double>(14, 3);
 
             OrderInfo[] orders = nameColumnValues.Select((name, i) =>
                 new OrderInfo(name, widthColumnValues[i], countColumnValues[i])).ToArray();
@@ -41,78 +52,11 @@ public class OrderInfoParser : IOrderInfoParser
         }
         catch (Exception exception)
         {
-            throw new InvalidOperationException("An unexpected error was occured", exception);
+            throw new InvalidOperationException("An unexpected error was occured while parsing", exception);
         }
         finally
         {
-            if (excel.ActiveSheet != null)
-            {
-                Marshal.ReleaseComObject(excel.ActiveSheet);
-            }
-
-            Marshal.ReleaseComObject(excel);
+            _excel.ReleaseComObjects();
         }
-    }
-
-    private Application GetExcel(string? workbookFilepath = null)
-    {
-        Application excel;
-        if (workbookFilepath == null)
-        {
-            object? excelCom = Marshal.GetActiveObject("Excel.Application");
-            if (excelCom == null)
-            {
-                throw new InvalidOperationException("Unable to connect with an active Excel application");
-            }
-            
-            excel = (excelCom as Application)!;
-        }
-        else
-        {
-            excel = new Application();
-            excel.Workbooks.Add(workbookFilepath);
-        }
-
-        return excel;
-    }
-
-    /// <summary>
-    /// Parse the values of the specified column
-    /// </summary>
-    /// <param name="worksheet">Excel worksheet</param>
-    /// <param name="column">Column id</param>
-    /// <typeparam name="T">Type of the column value</typeparam>
-    /// <returns>The list of values of the parsed column </returns>
-    /// <exception cref="InvalidOperationException">It's unable to read a value of the specified column</exception>
-    private List<T> ParseColumn<T>(Worksheet worksheet, int column)
-    {
-        dynamic? range = worksheet.UsedRange.Columns[column];
-        range = range.Resize[range.Rows.Count].Offset[3, 0];
-        range = range.SpecialCells(XlCellType.xlCellTypeVisible, Type.Missing);
-
-        var values = new List<T>();
-        foreach (Range area in range.Areas)
-        {
-            foreach (Range row in area.Rows)
-            {
-                if (row.Value == null)
-                {
-                    continue;
-                }
-
-                T value = Type.GetTypeCode(typeof(T)) switch
-                {
-                    TypeCode.Int32 => int.Parse(row.Value.ToString()),
-                    TypeCode.String => row.Value.ToString(),
-                    TypeCode.Decimal => decimal.Parse(row.Value.ToString()),
-                    TypeCode.Double => double.Parse(row.Value.ToString()),
-                    _ => throw new InvalidOperationException("Unable to read the value of the specified column")
-                };
-
-                values.Add(value);
-            }
-        }
-
-        return values;
     }
 }

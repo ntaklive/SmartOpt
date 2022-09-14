@@ -1,11 +1,14 @@
+using System.Collections.Generic;
+using Microsoft.Office.Interop.Excel;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
+using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
 using Marshal = System.Runtime.InteropServices.Marshal;
 
 namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public abstract class ExcelInteropWrapperBase : IExcelInteropWrapper
 {
-    protected void ReleaseObject(ref object? obj)
+    protected static void ReleaseObject(ref object? obj)
     {
         // Do not catch an exception from this.
         // You may want to remove these guards depending on
@@ -21,7 +24,12 @@ public abstract class ExcelInteropWrapperBase : IExcelInteropWrapper
         obj = null;
     }
 
-    public abstract void WriteTextInCell(int x, int y, string text);
+    public abstract void WriteValueInCell(int x, int y, object value);
     public abstract void MergeCells(int x1, int y1, int x2, int y2);
+    public abstract void SetVerticalAlignmentForRange(int x1, int y1, int x2, int y2, XlVAlign align);
+    public abstract void SetHorizontalAlignmentForRange(int x1, int y1, int x2, int y2, XlHAlign align);
+    public abstract void AutoFitColumnsInRange(int x1, int y1, int x2, int y2);
     public abstract void ReleaseComObjects();
+    public abstract void StartExcelApplication(ExcelInteropStartupArguments startupArguments);
+    public abstract IReadOnlyList<T> ParseColumn<T>(int column, int rowOffset);
 }

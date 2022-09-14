@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions.Models;
@@ -10,89 +7,89 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public class ReportExporter : IReportExporter
 {
+    private readonly IExcelInteropWrapper _excel;
+
+    public ReportExporter(IExcelInteropWrapper excel)
+    {
+        _excel = excel;
+    }
+    
     public void ExportToNewExcelWorkbook(Report report)
     {
-        IReadOnlyList<PatternLayout> patternLayouts = report.GetPatternLayouts();
-
-        List<PatternLayout> data = patternLayouts.Take(patternLayouts.Count() - 1).ToList();
-        PatternLayout remnants = patternLayouts.Last();
-        var app = new Application
+        _excel.StartExcelApplication(new ExcelInteropStartupArguments
         {
-            Visible = true,
+            IsVisible = true,
             DisplayAlerts = false,
-            WindowState = XlWindowState.xlMaximized
-        };
+            WindowState = XlWindowState.xlMaximized,
+            UseActiveWorksheet = false,
+            WorkbookFilepath = null
+        });
         
-        app.Workbooks.Add();
-        
-        var activeWorksheet = (app.ActiveSheet as Worksheet)!;
-        activeWorksheet.Name = "Результаты";
-
         var startFromRow = 3;
-        var index = 0;
-        var orderIndex = 1;
+        int index;
+        var patternLayoutIndex = 1;
 
-        activeWorksheet.Range[activeWorksheet.Cells[1, 1], activeWorksheet.Cells[1, 6]].Merge();
-        activeWorksheet.Cells[1, 1] = "Обработано";
+        _excel.WriteValueInCell(1, 1, "Обработано");
+        _excel.MergeCells(1, 1, 1, 6);
 
-        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]].Style).VerticalAlignment = XlVAlign.xlVAlignCenter;
-        ((Style) activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow, 7]].Style).HorizontalAlignment = XlHAlign.xlHAlignCenter;
+        _excel.SetVerticalAlignmentForRange(1, 1, 6, 1, XlVAlign.xlVAlignCenter);
+        _excel.SetHorizontalAlignmentForRange(1, 1, 6, 1, XlHAlign.xlHAlignCenter);
 
-        activeWorksheet.Cells[2, 1] = "№";
-        activeWorksheet.Cells[2, 2] = "Наименования";
-        activeWorksheet.Cells[2, 3] = "Ширина";
-        activeWorksheet.Cells[2, 4] = "Сколько изготовить";
-        activeWorksheet.Cells[2, 5] = "Отходы %";
-        activeWorksheet.Cells[2, 6] = "Сколько раз";
-        foreach (PatternLayout? order in data)
+        _excel.WriteValueInCell(2, 1,  "№");
+        _excel.WriteValueInCell(2, 2,  "Наименования");
+        _excel.WriteValueInCell(2, 3,  "Ширина");
+        _excel.WriteValueInCell(2, 4,  "Сколько изготовить");
+        _excel.WriteValueInCell(2, 5,  "Отходы %");
+        _excel.WriteValueInCell(2, 6,  "Сколько раз");
+        
+        IReadOnlyList<PatternLayout> patternLayouts = report.GetPatternLayouts();
+        foreach (PatternLayout patternLayout in patternLayouts)
         {
             index = 0;
-            IReadOnlyCollection<OrderInfo> o = order.Orders;
-            foreach (OrderInfo orderInfo in o)
+            IReadOnlyList<OrderInfo> orders = patternLayout.Orders;
+            foreach (OrderInfo order in orders)
             {
                 index++;
-                activeWorksheet.Cells[startFromRow + index - 1, 2] = orderInfo.Name;
-                activeWorksheet.Cells[startFromRow + index - 1, 3] = orderInfo.Width;
-                activeWorksheet.Cells[startFromRow + index - 1, 4] = (int) orderInfo.RollsCount;
+                _excel.WriteValueInCell(startFromRow + index - 1, 2, order.Name);
+                _excel.WriteValueInCell(startFromRow + index - 1, 3, order.Width);
+                _excel.WriteValueInCell(startFromRow + index - 1, 4, (int) order.RollsCount);
             }
-
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 5], activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
-            activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
-            activeWorksheet.Cells[startFromRow, 1] = orderIndex;
-            activeWorksheet.Cells[startFromRow, 5] = order.Waste;
-            activeWorksheet.Cells[startFromRow, 6] = order.RollsCount;
+        
+            _excel.MergeCells(startFromRow, 1, startFromRow + index - 1, 1);
+            _excel.MergeCells(startFromRow, 5, startFromRow + index - 1, 5);
+            _excel.MergeCells(startFromRow, 6, startFromRow + index - 1, 6);
+            
+            _excel.WriteValueInCell(startFromRow, 1, patternLayoutIndex);
+            _excel.WriteValueInCell(startFromRow, 5, patternLayout.Waste);
+            _excel.WriteValueInCell(startFromRow, 6, patternLayout.RollsCount);
+        
             startFromRow += index;
-            orderIndex++;
+            patternLayoutIndex++;
         }
-
-        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow, 6]].Merge();
-        activeWorksheet.Cells[startFromRow, 1] = "Не обработано";
+        
+        _excel.MergeCells(startFromRow, 1, startFromRow, 6);
+        _excel.WriteValueInCell(startFromRow, 1, "Не обработано");
+        
         startFromRow++;
- 
+        
         index = 0;
-        IReadOnlyCollection<OrderInfo> o2 = remnants.Orders;
-        foreach (OrderInfo orderInfo in o2)
+        IReadOnlyList<OrderInfo> ungroupedOrders = report.GetUngroupedOrders();
+        foreach (OrderInfo order in ungroupedOrders)
         {
             index++;
-            activeWorksheet.Cells[startFromRow + index - 1, 2] = orderInfo.Name;
-            activeWorksheet.Cells[startFromRow + index - 1, 3] = orderInfo.Width;
-            activeWorksheet.Cells[startFromRow + index - 1, 4] = orderInfo.RollsCount;
+            _excel.WriteValueInCell(startFromRow + index - 1, 2, order.Name);
+            _excel.WriteValueInCell(startFromRow + index - 1, 3, order.Width);
+            _excel.WriteValueInCell(startFromRow + index - 1, 4, (int) order.RollsCount);
         }
+        
+        _excel.MergeCells(startFromRow, 1, startFromRow + index - 1, 1);
+        _excel.MergeCells(startFromRow, 5, startFromRow + index - 1, 5);
+        _excel.MergeCells(startFromRow, 6, startFromRow + index - 1, 6);
 
-        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 1], activeWorksheet.Cells[startFromRow + index - 1, 1]].Merge();
-        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 5], activeWorksheet.Cells[startFromRow + index - 1, 5]].Merge();
-        activeWorksheet.Range[activeWorksheet.Cells[startFromRow, 6], activeWorksheet.Cells[startFromRow + index - 1, 6]].Merge();
-        activeWorksheet.Cells[startFromRow, 1] = orderIndex;
-        activeWorksheet.Range[activeWorksheet.Cells[2, 2], activeWorksheet.Cells[startFromRow, 6]].Columns.AutoFit();
+        _excel.WriteValueInCell(startFromRow, 1, patternLayoutIndex);
 
-        // todo: Not working
-        // if (isRectanglesDraw)
-        // {
-        //     DrawResults(activeWorksheet, data);
-        // }
+        _excel.AutoFitColumnsInRange(2, 2, startFromRow, 6);
 
-        Marshal.ReleaseComObject(app);
-        Marshal.ReleaseComObject(activeWorksheet);
+        _excel.ReleaseComObjects();
     }
 }

@@ -9,6 +9,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services
     {
         public IList<OrderInfo> AggregateOrdersWithIdenticalWidth(ICollection<OrderInfo> orders)
         {
+            // todo перенести в алгоритм
             IEnumerable<int> elementsCount = orders
                 .Select(x => x.Width)
                 .Distinct();
