@@ -69,6 +69,7 @@ public class MainWindowViewModel : ViewModelBase, IMainWindowViewModel
     public ICommand GeneratePatternLayouts { get; set; } = null!;
     public ICommand IncrementGroupSize { get; set; } = null!;
     public ICommand DecrementGroupSize { get; set; } = null!;
+    public ICommand SelectWorkbookFilepath { get; set; } = null!;
 
     public BusyIndicatorManager BusyIndicatorManager { get; }
 }

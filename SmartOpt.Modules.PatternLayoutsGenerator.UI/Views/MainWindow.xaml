@@ -70,11 +70,24 @@
                         IsBusy="{Binding BusyIndicatorManager.IsBusy}"
                         BusyContent="{Binding BusyIndicatorManager.Message}">
         <StackPanel Margin="10">
-            <Label>Выбранная книга</Label>
-            <TextBox
-                IsReadOnly="True"
-                Text="{Binding WorkbookFilename}">
-            </TextBox>
+            <Grid>
+                <StackPanel>
+                    <Label>Выбранная книга</Label>
+                    <TextBox
+                        IsReadOnly="True"
+                        Text="{Binding WorkbookFilename, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    </TextBox>
+                </StackPanel>
+                <Button
+                        Width="32"
+                        Height="32"
+                        Margin="0 15 15 0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Command="{Binding SelectWorkbookFilepath}">
+                    ...
+                </Button>
+            </Grid>
 
             <Label>Лимит ширины, мм</Label>
             <TextBox

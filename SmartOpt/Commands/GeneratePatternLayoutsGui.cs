@@ -2,10 +2,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using SmartOpt.Modules.PatternLayoutsGenerator.Services.Abstractions;
 using SmartOpt.Modules.PatternLayoutsGenerator.UI.Commands;
 using SmartOpt.Modules.PatternLayoutsGenerator.UI.ViewModels;
 using SmartOpt.Modules.PatternLayoutsGenerator.UI.Views;
+using MessageBox = System.Windows.MessageBox;
 
 namespace SmartOpt;
 
@@ -31,7 +33,6 @@ public partial class Application
                 _applicationState.SetMaxWaste(viewModel, viewModel.MaxWaste);
                 _applicationState.SetGroupSize(viewModel, viewModel.GroupSize);
 
-                // viewModel.IsInteractionAllowed = false;
                 viewModel.BusyIndicatorManager.Show(1, "Обрабатываем...");
 
                 Task task = TaskEx.Run(() => GeneratePatternLayoutsNoGui(patternLayoutService, reportExporter));
@@ -49,10 +50,19 @@ public partial class Application
                 finally
                 {
                     viewModel.BusyIndicatorManager.Close(1);
-                    // viewModel.IsInteractionAllowed = true;
                 }
             },
             CanExecuteGeneratePattenLayoutsCommand(viewModel));
+        viewModel.SelectWorkbookFilepath = new RelayCommand(_ =>
+        {
+            using var dialog = new OpenFileDialog();
+            DialogResult result = dialog.ShowDialog();
+            if (result == DialogResult.OK)
+            {
+                viewModel.WorkbookFilename = Path.GetFileName(dialog.FileName);
+                _applicationState.SetExcelWorkbookFilepath(viewModel, dialog.FileName);
+            }
+        });
         viewModel.IncrementGroupSize = new RelayCommand(_ => viewModel.GroupSize++);
         viewModel.DecrementGroupSize = new RelayCommand(_ => viewModel.GroupSize--);
 

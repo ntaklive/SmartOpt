@@ -12,8 +12,6 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator
             services.Bind<IPatternLayoutGenerator>().To<PatternLayoutGenerator>().InSingletonScope();
             services.Bind<IPatternLayoutService>().To<PatternLayoutService>().InSingletonScope();
             services.Bind<IReportExporter>().To<ReportExporter>().InSingletonScope();
-            services.Bind<IOrderInfoAggregator>().To<OrderInfoAggregator>().InSingletonScope();
-            services.Bind<IExcelInteropWrapper>().To<ExcelInteropWrapper>().InTransientScope();
         }
     }
 }

@@ -66,8 +66,6 @@
     <ItemGroup>
         <Compile Include="PatternLayoutGeneratorModule.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Services\Abstractions\Interfaces\IExcelInteropWrapper.cs" />
-        <Compile Include="Services\Abstractions\Interfaces\IOrderInfoAggregator.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IOrderInfoParser.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IPatternLayoutGenerator.cs" />
         <Compile Include="Services\Abstractions\Interfaces\IPatternLayoutService.cs" />
@@ -76,12 +74,8 @@
         <Compile Include="Services\Abstractions\Models\OrderInfo.cs" />
         <Compile Include="Services\Abstractions\Models\PatternLayout.cs" />
         <Compile Include="Services\Abstractions\Models\Report.cs" />
-        <Compile Include="Services\Implementations\ExcelInteropWrapper.cs" />
-        <Compile Include="Services\Implementations\ExcelInteropWrapperBase.cs" />
-        <Compile Include="Services\Implementations\OrderInfoAggregator.cs" />
         <Compile Include="Services\Implementations\OrderInfoParser.cs" />
         <Compile Include="Services\Implementations\PatternLayoutGenerator.cs" />
-        <Compile Include="Services\Implementations\PatternLayoutGenerator1.cs" />
         <Compile Include="Services\Implementations\PatternLayoutService.cs" />
         <Compile Include="Services\Implementations\ReportExporter.cs" />
     </ItemGroup>
