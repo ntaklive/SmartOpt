@@ -34,28 +34,11 @@ public class PatternLayoutService : IPatternLayoutService
     private Report GeneratePatternLayoutsFromExcelWorksheetInternal(
         IList<OrderInfo> orders, int maxWidth, double maxWaste, int groupSize)
     {
-        IReadOnlyList<OrderInfo> mergedOrders = AggregateOrdersWithIdenticalWidth(orders);
         Report report = _patternLayoutGenerator.GeneratePatternLayoutsFromOrders(
-            mergedOrders, maxWidth, maxWaste, groupSize);
+            orders.AsIReadOnlyList(), maxWidth, maxWaste, groupSize);
 
         return report;
     }
 
-    private static IReadOnlyList<OrderInfo> AggregateOrdersWithIdenticalWidth(IList<OrderInfo> orders)
-    {
-        IEnumerable<int> elementsCount = orders
-            .Select(x => x.Width)
-            .Distinct();
-
-        return elementsCount
-            .Select(item => orders.Where(x => x.Width == item))
-            .Select(tmp => tmp.Aggregate((prev, next) =>
-            {
-                prev.Name += ", " + next.Name;
-                prev.RollsCount += next.RollsCount;
-                return prev;
-            }))
-            .ToList()
-            .AsIReadOnlyList();
-    }
+    
 }

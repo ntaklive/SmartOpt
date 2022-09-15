@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ClosedXML.Excel;
@@ -38,16 +39,20 @@ public class OrderInfoParser : IOrderInfoParser
     
     private IList<OrderInfo> ParseOrdersFromExcelWorksheetInternal(string workbookFilepath)
     {
-        using var workbook = new XLWorkbook(workbookFilepath);
-        IXLWorksheet worksheet = workbook.Worksheets.First();
-
+        var tempFilepath = $"{Path.Combine(Path.GetDirectoryName(workbookFilepath), Path.GetFileNameWithoutExtension(workbookFilepath))}_temp{Path.GetExtension(workbookFilepath)}";
+        
         try
         {
+            File.Copy(workbookFilepath, tempFilepath, true);
+        
+            using var workbook = new XLWorkbook(tempFilepath);
+            IXLWorksheet worksheet = workbook.Worksheets.First();
+            
             IReadOnlyList<string> nameColumnValues = ParseColumn<string>(worksheet, 1, 3);
             IReadOnlyList<int> widthColumnValues = ParseColumn<int>(worksheet, 3, 3);
-            IReadOnlyList<int> requestKilosColumnValues = ParseColumn<int>(worksheet, 4, 3);
-            IReadOnlyList<double> doneKilosColumnValues = ParseColumn<double>(worksheet, 5, 3);
-            IReadOnlyList<int> unknownValuesColumnValues = ParseColumn<int>(worksheet, 13, 3);
+            // IReadOnlyList<int> requestKilosColumnValues = ParseColumn<int>(worksheet, 4, 3);
+            // IReadOnlyList<double> doneKilosColumnValues = ParseColumn<double>(worksheet, 5, 3);
+            // IReadOnlyList<int> unknownValuesColumnValues = ParseColumn<int>(worksheet, 13, 3);
             IReadOnlyList<double> countColumnValues = ParseColumn<double>(worksheet, 14, 3);
 
             OrderInfo[] orders = nameColumnValues.Select((name, i) =>
@@ -58,6 +63,14 @@ public class OrderInfoParser : IOrderInfoParser
         catch (Exception exception)
         {
             throw new InvalidOperationException("An unexpected error was occured while parsing", exception);
+        }
+        finally
+        {
+            var tempFile = new FileInfo(tempFilepath);
+            if (tempFile.Exists)
+            {
+                tempFile.Delete();
+            }
         }
     }
     
@@ -70,7 +83,7 @@ public class OrderInfoParser : IOrderInfoParser
     /// <typeparam name="T">Type of the column value</typeparam>
     /// <returns>The list of values of the parsed column </returns>
     /// <exception cref="InvalidOperationException">It's unable to read a value of the specified column</exception>
-    private IReadOnlyList<T> ParseColumn<T>(IXLWorksheet worksheet, int column, int rowOffset)
+    private static IReadOnlyList<T> ParseColumn<T>(IXLWorksheet worksheet, int column, int rowOffset)
     {
         IXLRangeRows visibleRows = worksheet.RangeUsed().Rows(row => !row.WorksheetRow().IsHidden);
 
@@ -84,7 +97,7 @@ public class OrderInfoParser : IOrderInfoParser
                 continue;
             }
 
-            var success = cell.TryGetValue<T>(out T value);
+            cell.TryGetValue(out T value);
 
             values.Add(value);
         }

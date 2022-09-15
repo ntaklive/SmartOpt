@@ -4,16 +4,15 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{7AE45C5E-CC8F-4E14-938B-B425B7D2D086}</ProjectGuid>
+        <ProjectGuid>{4684E8EE-B6C8-4AE1-BA41-E6B7352C7BC7}</ProjectGuid>
         <OutputType>Exe</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>SmartOpt</RootNamespace>
-        <AssemblyName>SmartOpt</AssemblyName>
+        <RootNamespace>TestConsole</RootNamespace>
+        <AssemblyName>TestConsole</AssemblyName>
         <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -45,60 +44,29 @@
           <HintPath>..\packages\ExcelNumberFormat.1.1.0\lib\net20\ExcelNumberFormat.dll</HintPath>
         </Reference>
         <Reference Include="Microsoft.CSharp" />
-        <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-          <HintPath>..\packages\Ninject.3.2.2.0\lib\net40\Ninject.dll</HintPath>
-        </Reference>
-        <Reference Include="PresentationCore" />
-        <Reference Include="PresentationFramework" />
         <Reference Include="System" />
-        <Reference Include="System.configuration" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
-        <Reference Include="System.Security" />
-        <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-          <HintPath>..\packages\System.ValueTuple.4.3.0\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
-        </Reference>
-        <Reference Include="System.Windows.Forms" />
         <Reference Include="System.Xml" />
-        <Reference Include="Theraot.Core, Version=3.2.11.0, Culture=neutral, PublicKeyToken=b1460dff8a28f7a7, processorArchitecture=MSIL">
-          <HintPath>..\packages\Theraot.Core.3.2.11\lib\net40\Theraot.Core.dll</HintPath>
-        </Reference>
         <Reference Include="WindowsBase" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Application.cs" />
-        <Compile Include="ArgumentsParser.cs" />
-        <Compile Include="Commands\GeneratePatternLayoutsGui.cs" />
-        <Compile Include="Commands\GeneratePatternLayoutsNoGui.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\SmartOpt.Core\SmartOpt.Core.csproj">
-        <Project>{8615cc19-7f04-4344-a552-38ca4893950c}</Project>
-        <Name>SmartOpt.Core</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\SmartOpt.Modules.PatternLayoutsGenerator.UI\SmartOpt.Modules.PatternLayoutsGenerator.UI.csproj">
-        <Project>{3ac5b28e-f828-47c9-b008-e603870c3590}</Project>
-        <Name>SmartOpt.Modules.PatternLayoutsGenerator.UI</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\SmartOpt.Modules.PatternLayoutsGenerator\SmartOpt.Modules.PatternLayoutsGenerator.csproj">
-        <Project>{031e06c1-ca58-4183-9dcc-e6c00afb47d8}</Project>
-        <Name>SmartOpt.Modules.PatternLayoutsGenerator</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\SmartOpt.Modules\SmartOpt.Modules.csproj">
-        <Project>{31d6b295-1db2-49cb-a697-4622cde2a6d7}</Project>
-        <Name>SmartOpt.Modules</Name>
-      </ProjectReference>
+      <COMReference Include="Excel">
+        <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+        <VersionMajor>1</VersionMajor>
+        <VersionMinor>9</VersionMinor>
+        <Lcid>0</Lcid>
+        <WrapperTool>tlbimp</WrapperTool>
+        <Isolated>False</Isolated>
+        <EmbedInteropTypes>True</EmbedInteropTypes>
+      </COMReference>
     </ItemGroup>
     <ItemGroup>
-      <None Include="App.config" />
       <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-      <AdditionalFiles Include="PatternLayoutsGeneratorGui.bat">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </AdditionalFiles>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

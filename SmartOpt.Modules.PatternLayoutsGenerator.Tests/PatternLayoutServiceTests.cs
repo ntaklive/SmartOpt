@@ -80,7 +80,7 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Tests
             );
 
             // Act
-            Report report = patternLayoutService.GeneratePatternLayoutsFromOrders(orders.AsIReadOnlyCollection(), maxWidth, maxWaste, groupSize);
+            Report report = patternLayoutService.GeneratePatternLayoutsFromOrders(orders.AsIReadOnlyList(), maxWidth, maxWaste, groupSize);
 
             // Assert
             AssertReportsAreEqual(expectedReport, report);

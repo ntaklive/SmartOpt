@@ -1,0 +1,1 @@
+smartopt.exe -op generatePatternLayouts -gui

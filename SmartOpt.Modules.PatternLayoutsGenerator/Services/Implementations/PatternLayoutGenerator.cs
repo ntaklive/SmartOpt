@@ -9,9 +9,11 @@ namespace SmartOpt.Modules.PatternLayoutsGenerator.Services;
 
 public class PatternLayoutGenerator : IPatternLayoutGenerator
 {
-    public Report GeneratePatternLayoutsFromOrders(IReadOnlyCollection<OrderInfo> orderInfos,
+    public Report GeneratePatternLayoutsFromOrders(IReadOnlyList<OrderInfo> orderInfos,
         int maxWidth, double maxWaste, int groupSize)
     {
+        orderInfos = AggregateOrdersWithIdenticalWidth(orderInfos);
+        
         if (orderInfos.Count < groupSize)
         {
             groupSize = orderInfos.Count;
@@ -161,5 +163,23 @@ public class PatternLayoutGenerator : IPatternLayoutGenerator
         }
 
         return index >= 0;
+    }
+    
+    private static IReadOnlyList<OrderInfo> AggregateOrdersWithIdenticalWidth(IReadOnlyList<OrderInfo> orders)
+    {
+        IEnumerable<int> elementsCount = orders
+            .Select(x => x.Width)
+            .Distinct();
+
+        return elementsCount
+            .Select(item => orders.Where(x => x.Width == item))
+            .Select(tmp => tmp.Aggregate((prev, next) =>
+            {
+                prev.Name += ", " + next.Name;
+                prev.RollsCount += next.RollsCount;
+                return prev;
+            }))
+            .ToList()
+            .AsIReadOnlyList();
     }
 }
