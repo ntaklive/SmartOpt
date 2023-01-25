@@ -1,0 +1,9 @@
+@startsalt Ui
+mainframe **SmartOpt**
+{
+  Лимит ширины  | "6000"
+  Размер группы | "5   "
+  Лимит отходов | "3.0%"
+  [  OK  ]
+}
+@endsalt
