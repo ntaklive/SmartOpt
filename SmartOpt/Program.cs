@@ -13,6 +13,8 @@ using SmartOpt.Modules.PatternLayoutsGenerator.UI;
 
 namespace SmartOpt;
 
+// TODO: WARNING! You must add '<loadFromRemoteSources enabled="true"/>' to the '<runtime>' block in the 'SmartOpt.exe.config' after publishing
+
 public static class Program
 {
     private static readonly IApplicationState ApplicationState = new ApplicationState();
